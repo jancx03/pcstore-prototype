@@ -18,19 +18,21 @@
 
 <script>
 import BaseItem from 'components/BaseItem.vue';
-import items from '#/items.js';
 import TheSearchBar from 'components/TheSearchBar.vue';
 import TheProductView from 'components/TheProductView.vue';
 
+const __initialState__ = false;
+
 export default {
   components: {BaseItem, TheSearchBar, TheProductView},
+  inject: {_items: 'items'},
   data() {
     return {
-      items: [...items],
+      items: this._items,
       windowSize: window.innerWidth,
-      displaySearchBar: false,
+      displaySearchBar: __initialState__,
       productViewItem: null,
-      showProductView: false,
+      showProductView: __initialState__,
     };
   },
   watch: {
@@ -38,7 +40,7 @@ export default {
       if (this.$route.query.search) {
         this.search(this.$route.query.search);
       } else {
-        this.items = items;
+        this.items = this._items;
       }
     },
   },
@@ -66,61 +68,34 @@ export default {
       if (window.innerWidth < 991) {
         this.displaySearchBar = true;
       } else {
-        this.displaySearchBar = false;
+        this.displaySearchBar = __initialState__;
       }
     },
-    search(_term) {
-      const term = _term.toUpperCase();
-      this.items = this.filter(items, term);
+    search(term) {
+      const terms = term.toUpperCase().split(' ');
+      this.items = this.filter(this._items, terms);
     },
-    filter(items, term) {
-      if (this.moreThanOne(term)) {
-        const terms = term.split(' ');
-        return this.filterMany(terms, items);
-      } else {
-        return this.filterOne(term, items);
-      }
-    },
-    filterOne(term, items) {
+    filter(items, terms) {
       const results = [];
-      items.find((item) => {
+      //
+      items.find((item, i) => {
         const keywords = item.keywords.toUpperCase();
-        if (keywords.includes(term)) {
+        let doesNotMatch = __initialState__;
+        terms.find((term) => {
+          if (!(keywords.includes(term))) {
+            return doesNotMatch = true;
+          }
+        });
+        if (/* doesMatch */ !doesNotMatch) {
           results.push(item);
         }
       });
-      return results;
-    },
-    filterMany(terms, items) {
-      const results = [...items];
-      const didNotMatch = [];
-      results.find((item, i) => {
-        const keywords = item.keywords.toUpperCase().split(' ');
-        terms.find((term) => {
-          if (!(keywords.indexOf(term) >= 0)) {
-            return didNotMatch.push(i);
-          }
-        });
-      });
 
-      didNotMatch.sort((a, b) => a - b);
-      didNotMatch.reverse();
-
-      didNotMatch.find((index) => {
-        console.log(index);
-        results.splice(index, 1);
-      });
-      console.log(results);
       return results;
     },
     openProduct(item) {
       this.productViewItem = item;
       this.showProductView = true;
-    },
-    moreThanOne(term) {
-      if (term.split(' ').length > 1) {
-        return true;
-      } else return false;
     },
   },
   mounted() {

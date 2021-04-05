@@ -8,11 +8,16 @@
 
 <script>
 import TheNavbar from 'components/TheNavbar.vue';
-import items from '#/items.js';
+import Db from '#/db.js';
+Db.populate();
 
 export default {
   components: {TheNavbar},
-  provide: [items],
+  provide() {
+    return {
+      items: Db.getItems(),
+    };
+  },
 };
 </script>
 
