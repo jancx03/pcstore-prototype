@@ -2,7 +2,7 @@
   <nav>
     <div class="nav-items">
       <TheNavbarHeader @toggleMenu="toggleMenu" class="the-header"/>
-      <TheSearchBar v-show="displaySearchBar" class="search-bar" />
+      <TheSearchBar class="search-bar" />
       <TheCartIcon class="cart-icon" />
       <TheMenuBar :toggle="showMenu" />
     </div>
@@ -19,34 +19,13 @@ export default {
   components: {TheCartIcon, TheSearchBar, TheNavbarHeader, TheMenuBar},
   data() {
     return {
-      displaySearchBar: true,
       showMenu: false,
     };
   },
   methods: {
-    onWindowResize() {
-      if (window.innerWidth < 991) {
-        this.displaySearchBar = false;
-      } else {
-        this.displaySearchBar = true;
-      }
-    },
     toggleMenu() {
       this.showMenu = !this.showMenu;
     },
-  },
-  created() {
-    window.addEventListener('resize', this.onWindowResize);
-  },
-  mounted() {
-    if (window.innerWidth < 991) {
-      this.displaySearchBar = false;
-    } else {
-      this.displaySearchBar = true;
-    }
-  },
-  unmounted() {
-    window.removeEventListener('resize', this.onWindowResize);
   },
 };
 </script>
@@ -95,5 +74,12 @@ button:active {
 
 .the-header {
   margin-left: 2rem;
+}
+
+/* Search Bar */
+@media screen and (max-width: 1024px) {
+  .search-bar {
+    display: none;
+  }
 }
 </style>

@@ -1,13 +1,12 @@
 <template>
   <section>
-    <header v-show="displaySearchBar" class="search-bar">
+    <header class="search-bar">
       <TheSearchBar />
     </header>
     <TheProductView :item="productViewItem"
     :showProduct="showProductView"
-    :windowSize="windowSize"
     @closeProductView="showProductView = false"/>
-    <main :class="gridSize">
+    <main v-show="!showProductView">
       <BaseItem v-for="(item, index) in items"
       :item="item"
       :key="index"
@@ -29,8 +28,6 @@ export default {
   data() {
     return {
       items: this._items,
-      windowSize: window.innerWidth,
-      displaySearchBar: __initialState__,
       productViewItem: null,
       showProductView: __initialState__,
     };
@@ -44,33 +41,7 @@ export default {
       }
     },
   },
-  computed: {
-    gridSize() {
-      if (this.windowSize > 1500) {
-        return 'grid-5-col';
-      } else if (this.windowSize > 1256) {
-        return 'grid-4-col';
-      } else if (this.windowSize > 1024) {
-        return 'grid-3-col';
-      } else if (this.windowSize > 665) {
-        return 'grid-2-col';
-      } else {
-        return 'grid-1-col';
-      }
-    },
-
-  },
   methods: {
-    onWindowResize() {
-      // grid
-      this.windowSize = window.innerWidth;
-      // search bar
-      if (window.innerWidth < 991) {
-        this.displaySearchBar = true;
-      } else {
-        this.displaySearchBar = __initialState__;
-      }
-    },
     search(term) {
       const terms = term.toUpperCase().split(' ');
       this.items = this.filter(this._items, terms);
@@ -103,17 +74,6 @@ export default {
     if (this.$route.query.search) {
       this.search(this.$route.query.search);
     }
-    // search bar
-    if (window.innerWidth < 991) {
-      this.displaySearchBar = true;
-    } else {
-      this.displaySearchBar = false;
-    }
-    // watch resize for styling
-    window.addEventListener('resize', this.onWindowResize);
-  },
-  unmounted() {
-    window.removeEventListener('resize', this.onWindowResize);
   },
 };
 </script>
@@ -133,25 +93,34 @@ main {
   transition: all .3s linear;
 }
 
-.grid-5-col {
-  grid-template-columns:  20% 20% 20% 20% 20%;
+
+/* Grid */
+@media screen and (max-width: 528px) {
+  main {
+    grid-template-columns:  1fr;
+  }
+}
+@media screen and (min-width: 768px) {
+  main {
+    grid-template-columns:  repeat(2, 1fr);
+  }
+}
+@media screen and (min-width: 1024px) {
+  main {
+    grid-template-columns:  repeat(3, 1fr);
+  }
+}
+@media screen and (min-width: 1256px) {
+  main {
+    grid-template-columns:  repeat(4, 1fr);
+  }
+}
+@media screen and (min-width: 1500px) {
+  main {
+    grid-template-columns:  repeat(5, 1fr);
+  }
 }
 
-.grid-4-col {
-    grid-template-columns:  25% 25% 25% 25%;
-}
-
-.grid-3-col {
-    grid-template-columns:  33% 33% 33%;
-}
-
-.grid-2-col {
-    grid-template-columns:  50% 50%;
-}
-
-.grid-1-col {
-    grid-template-columns:  100%;
-}
 
 section {
   padding: 1rem 5rem;
@@ -167,4 +136,12 @@ section {
   padding: 2rem 0;
   z-index: 4;
 }
+
+/* Search Bar */
+@media screen and (min-width: 1024px) {
+  .search-bar {
+    display: none;
+  }
+}
+
 </style>

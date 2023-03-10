@@ -1,7 +1,7 @@
 <template>
-  <dialog @click="toggleDialog" :open="showProduct" class="dialog">
+  <dialog :style="dialogStyle" @click="toggleDialog" :open="showProduct" class="dialog">
     <BaseButton class="close" className="flat inactive-white"><i class="fas fa-times"></i></BaseButton>
-    <main :class="mainClass">
+    <main class="product-view">
       <div class="column">
         <img :src="product.img">
       </div>
@@ -23,12 +23,11 @@
 
 <script>
 export default {
-  props: ['item', 'showProduct', 'windowSize'],
+  props: ['item', 'showProduct'],
   emits: ['closeProductView'],
   data() {
     return {
       product: {},
-      gridSize: this.windowSize,
     };
   },
   watch: {
@@ -37,9 +36,6 @@ export default {
         this.product = this.item;
       }
     },
-    windowSize() {
-      this.gridSize = this.windowSize;
-    },
   },
   computed: {
     titles() {
@@ -47,12 +43,12 @@ export default {
       titles.splice(titles.indexOf('img'), 1);
       return titles;
     },
-    mainClass() {
-      if (this.windowSize > 1024) {
-        return ['product-view', 'grid-3-col'];
-      } else {
-        return ['product-view', 'grid-1-col'];
-      }
+    dialogStyle() {
+      // const body = querySelector('body');
+      const body = document.body;
+      let height = body.offsetHeight;
+      height = height.toString() + 'px';
+      return {height};
     },
   },
   methods: {
@@ -82,6 +78,18 @@ export default {
   grid-template-rows:  auto;
   transition: all .3s linear;
   justify-items: center;
+}
+
+/* Grid */
+@media screen and (max-width: 1023px) {
+  main {
+    grid-template-columns:  100%;
+  }
+}
+@media screen and (min-width: 1024px) {
+  main {
+    grid-template-columns:  30% 50% 20%;
+  }
 }
 
 .grid-3-col {
